@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>GifTastic</title>
+    <style type="text/css">
+    
+    div {
+      margin: 10px;
+    }
+
+    img {
+      height: 150px;
+      width: 250px;
+      padding: 10px;
+      float: left;
+
+    }
+
+  </style>
+</head>
+
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+
+<body>
+
+
+<div class="jumbotron">
+  <h1>Giftastic!!</h1>
+</div>
+<div class="container">
+
+	
+	<div id='buttons-view'></div>
+
+	<form id='buttons-form'>
+  <label for="buttons-input">Add your favorite food!</label>
+	<br>
+	<input type="text" id="buttons-input">
+  <br>
+  <br>
+  <input id='add-food' class="btn-primary" type="submit" value="Add a Food">
+  </form>
+
+
+	<div id="gif-view" style="font-size: 25px;"></div>
+
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+
+
+     var foods = ['pizza','fried chicken', 'spaghetti', 'tacos', 'rice', 'eggs', 'bacon', 'burger', 'french fries', 'steak','shrimp', 'kale', 'toast', 'carrots' , 'cake'];
+
+
+
+    function displayInfo() {
+
+    var food = $(this).attr('data-name');
+
+    var queryURL = "http://api.giphy.com/v1/gifs/search?q=" + food + "&api_key=dc6zaTOxFJmzC&limit=10";
+
+
+     $.ajax({
+          url: queryURL,
+          method: "GET"
+        }).done(function(response) {
+        console.log(response);
+
+
+var results = response.data;
+
+for (var i = 0; i < results.length; i++) {
+
+var gifDiv = $("<div class ='item'>");
+
+var rating = results[i].rating;
+
+var p = $('<p>').text("Rating: " + rating);
+
+var gifImage = $("<img>");
+gifImage.attr('src', results[i].images.fixed_height_still.url);
+gifImage.attr('data-still', results[i].images.fixed_height_still.url);
+gifImage.attr('data-animate', results[i].images.fixed_height.url);
+gifImage.attr('data-state', 'still');
+gifImage.addClass('image');
+gifDiv.prepend(gifImage);
+gifDiv.prepend(p);
+
+$('#gif-view').prepend(gifDiv);
+
+}
+
+});
+
+};
+
+
+
+   function renderButtons() {
+
+    $("#buttons-view").empty();
+
+   	for (var i = 0; i < foods.length; i++) {
+   		
+   		var a = $("<button>");
+
+      a.addClass('btn-primary')
+   		a.addClass('food');
+   		a.attr('data-name', foods[i]);
+   		a.text(foods[i]);
+   		$('#buttons-view').prepend(a);
+   	}
+   };
+
+
+   $('#add-food').on('click',function (event) {
+
+    event.preventDefault();
+
+    var food = $('#buttons-input').val();
+
+    foods.push(food);
+
+    renderButtons();
+
+   });
+
+
+   $(document).on("click" , ".food" , displayInfo);
+   $(document).on('click' , ".image" , function () {
+
+    var state = $(this).attr('data-state');
+    if (state === 'still') {
+      $(this).attr('src', $(this).data('animate'));
+      $(this).attr('data-state', 'animate');
+    }
+    else {
+      $(this).attr('src', $(this).data('still'));
+      $(this).attr('data-state', 'still');
+    }
+   });
+
+   renderButtons();
+
+
+
+
+
+</script>
+
+
+</div>
+
+
+
+
+
+
+</body>
+</html>
